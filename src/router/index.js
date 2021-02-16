@@ -1,20 +1,21 @@
 import { createRouter, createWebHashHistory } from "vue-router";
-import Home from "../views/Home.vue";
 
 const routes = [
   {
+    // path:"/",
+    // redirect:"login"
+    //我不明白上面和下面有什么区别，上面的报错下面不报错,<>之间不能有空格<>
     path: "/",
-    name: "Home",
-    component: Home
+    redirect: "login"
   },
   {
-    path: "/about",
-    name: "About",
+    path: "/login",
+    name: "login",
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
     component: () =>
-      import(/* webpackChunkName: "about" */ "../views/About.vue")
+      import(/* webpackChunkName: "about" */ "../views/login/index.vue")
   }
 ];
 
