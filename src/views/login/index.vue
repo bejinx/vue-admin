@@ -10,10 +10,17 @@
         <label>邮箱</label>
         <el-input type="text" v-model="ruleForm.username" autocomplete="off"></el-input>
       </el-form-item>
+
       <el-form-item  prop="pass" class="item-from">
         <label>密码</label>
-        <el-input type="password" v-model="ruleForm.pass" autocomplete="off" maxlength="20" minlength="6"></el-input>
+        <el-input type="text" v-model="ruleForm.pass" autocomplete="off" maxlength="20" minlength="6"></el-input>
       </el-form-item>
+
+      <el-form-item  prop="password" class="item-from" v-show="model === 'register'">
+        <label>重复密码</label>
+        <el-input type="password" v-model="ruleForm.password" autocomplete="off" maxlength="20" minlength="6"></el-input>
+      </el-form-item>
+
       <el-form-item  prop="verify" class="item-from">
         <label>验证码</label>
         <el-row :gutter="20">
@@ -34,12 +41,15 @@
   </div>
 </template>
 <script>
+import {stripscript} from "@/utils/validate"
 export default {
   name: "Home",
   // components: {},
   data(){
       var checkAge = (rule, value, callback) => {
         let reg = /^[a-z0-9]{6}$/
+        this.ruleForm.verify =stripscript(value);
+        this.value = stripscript(value);
         if (!value) {
           return callback(new Error('请输入验证码'));
         }else if(!reg.test(value)){
@@ -61,28 +71,54 @@ export default {
           callback();
         }
       };
+      //验证密码
       var validatePass2 = (rule, value, callback) => {
+        //过滤字符
+        
+        this.ruleForm.pass =stripscript(value);
+        value = stripscript(value);
         //字母+数字
         let reg = /^(?!\D+$)(?![^a-zA-Z]+$)\S{6,20}$/
         if (value === '') {
           callback(new Error('请输入密码'));
         } else if (!reg.test(value)) {
           callback(new Error('密码必须包含数字和字母'));
-        }else if (value !== "123456") {
+        }else if (value !== "123456a") {
           callback(new Error('密码错误'));
         } else {
           callback();
         }
       };
+      //验证重复密码
+      var validatePass1 = (rule, value, callback) => {
+        if(this.model == 'login'){callback();}
+        this.ruleForm.password =stripscript(value);
+        value = stripscript(value);
+        console.log(value);
+        //字母+数字
+        let reg = /^(?!\D+$)(?![^a-zA-Z]+$)\S{6,20}$/
+        if (value === '') {
+          callback(new Error('请输入密码'));
+        } else if (!reg.test(value)) {
+          callback(new Error('密码必须包含数字和字母'));
+        }else if (value !=this.ruleForm.pass ) {
+          callback(new Error('密码不一致'));
+        } else {
+          callback();
+        }
+      }
     return {
       menuTab:[
-        { txt:'登录',current:false},
-        { txt:'注册',current:true}
+        { txt:'登录',current:false,type:'login'},
+        { txt:'注册',current:true,type:'register'}
       ],
+      //模块值
+      model:'register',
       //表单的数据
        ruleForm: {
           username: '',
           pass: '',
+          password: '',
           verify: ''
         },
         rules: {
@@ -91,6 +127,9 @@ export default {
           ],
           pass: [
             { validator: validatePass2, trigger: 'blur' }
+          ],
+          password: [
+            { validator: validatePass1, trigger: 'blur' }
           ],
           verify: [
             { validator: checkAge, trigger: 'blur' }
@@ -109,6 +148,8 @@ export default {
         elem.current = false
       });
         data.current = true
+        console.log(data.type);
+        this.model = data.type;
     },
     //表单方法
      submitForm(formName) {
