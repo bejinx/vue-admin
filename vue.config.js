@@ -54,11 +54,20 @@ module.exports = {
   devServer: {
     open: false, // 编译完成是否打开网页
     host: "0.0.0.0", // 指定使用地址，默认localhost,0.0.0.0代表可以被外界访问
-    port: 8080, // 访问端口
+    port: 8070, // 访问端口
     https: false, // 编译失败时刷新页面
     hot: true, // 开启热加载
     hotOnly: false,
     proxy: null, // 设置代理
+    proxy: { 
+      '/devApi': {
+        target: 'http://www.web-jshtml.cn/productapi',//设置你调用的接口域名和端口号 别忘了加http
+        changeOrigin: true,
+        pathRewrite: {
+          '^/devApi': ''//这里理解成用‘/api’代替target里面的地址，后面组件中我们掉接口时直接用api代替 比如我要调用'http://40.00.100.100:3002/user/add'，直接写‘/api/user/add’即可
+        }
+    }
+  },
     overlay: {
       // 全屏模式下是否显示脚本错误
       warnings: true,
